@@ -1,0 +1,62 @@
+---
+title: "Projet"
+author: "Mai Chi Do, Heloise ROZIER, Romane LE GOFF"
+date: "10/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(sf)
+library(dplyr)
+library(tidyverse)
+# Pour les modeles d'econometrie spatiale
+library(spdep)
+#Pour le calcul de distance (fonction rdist)
+library(fields)
+#Pour la lecture de table SAS (fonction read.sas7bdat)
+library(sas7bdat)
+# Pour la cartographie
+library(RColorBrewer)
+library(classInt)
+library(Guerry)
+library(GISTools)
+library(sp)
+```
+
+# Importation des données
+
+```{r}
+data(gfrance85)
+```
+
+# Cartographie
+
+```{r}
+my.palette <- brewer.pal(n = 7, name = "OrRd")
+
+spplot(gfrance85,"Crime_pers", col.regions = my.palette, cuts = 6, col = "transparent", main="Nombre de gros crimes en France (1833)")
+spplot(gfrance85,"Crime_prop", col.regions = my.palette, cuts = 6, col = "transparent", main="Nombre de suicides en France (1833)")
+spplot(gfrance85,"Wealth", col.regions = my.palette, cuts = 6, col = "transparent", main="Richesses en France (1833)")
+```
+
+# Calculer des centroides des departements
+
+```{r}
+centroids <- coordinates(gfrance85)
+plot(gfrance85)
+points(centroids, pch = 20, col = "Green", cex=0.5)
+```
+
+# Matrice de contiguité
+
+## Definition de voisins
+
+```{r}
+voisins <- poly2nb(gfrance85)
+summary(voisins)
+```
+
