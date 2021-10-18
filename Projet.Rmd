@@ -60,4 +60,4 @@ voisins <- poly2nb(gfrance85)
 summary(voisins)
 ```
 
-# essay 2
+# essay 1
