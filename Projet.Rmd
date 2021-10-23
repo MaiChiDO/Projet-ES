@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r,include=FALSE}
 library(sf)
 library(dplyr)
 library(tidyverse)
@@ -60,4 +60,61 @@ voisins <- poly2nb(gfrance85)
 summary(voisins)
 ```
 
-# essay 2
+`r gfrance85$Department[c(22,26,54,59,63,65,70)] ` sont les départements les plus isolés, tandis que `r gfrance85$Department[46] ` et `r gfrance85$Department[72] `
+les plus connectées.
+
+```{r}
+### Matrice de contiguite standardisee en ligne, methode par defaut
+cont.w <- nb2listw(voisins,style="W")
+
+### Plus proches voisins
+### Definition des 2 plus proches voisins
+#   k indique le nombre de voisins
+cartePPV2.knn <- knearneigh(centroids,k=2) 
+cartePPV2.nb  <- knn2nb(cartePPV2.knn)
+PPV2.w<-nb2listw(cartePPV2.nb,style="W") # Matrice de voisinage des 2 ppv
+
+### Definition des 5 plus proches voisins
+cartePPV5.knn<-knearneigh(centroids,k=5) 
+cartePPV5.nb<- knn2nb(cartePPV5.knn)
+PPV5.w<-nb2listw(cartePPV5.nb,style="W")
+
+### Autre option
+##basee sur la distance avec des coordonnees ------------------------------------------------------------------------
+# wd5 <- dnearneigh(centro, 0, 5)
+## en km si true
+
+### Matrice de voisinage fondee sur la distance euclidienne
+distance<-rdist(centroids) 
+# permet de calculer la dist entre tous les individus en fct de leurs coordonnees
+# voir aussi fonction "dist" pour d'autres distances
+
+diag(distance)<-0
+## rayon de 100 km
+distance[distance>=100000 ]<-0
+dist<- 1.e6 / (distance*distance) #inverse de la dist au carre
+dist[dist>1.e9]<-0
+dist.w<-mat2listw(dist, row.names = NULL, style="W")
+
+############################################
+### Statistiques descriptives            ###
+############################################
+
+### Tableau 1 : Analyses descriptives
+
+
+############################################
+### Graphique de Moran                   ###
+############################################
+
+# stat des d'autocorr spatiale
+
+### Test de Moran, Donnees Brutes
+moran.test(gfrance85$Suicides, dist.w, zero.policy=TRUE) # permet de recup la stat de Moran
+#I de Moran = 5.2661
+
+### Graphique de Moran
+moran.plot(x=gfrance85$Crime_pers,dist.w,xlab="Criminalite France 1833",
+           ylab="Taux dans le voisinage",
+           zero.policy=TRUE)
+```
