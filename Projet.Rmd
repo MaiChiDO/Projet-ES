@@ -38,17 +38,13 @@ data(gfrance85)
 ```{r}
 my.palette <- brewer.pal(n = 7, name = "OrRd")
 
-spplot(gfrance85,"Crime_pers", col.regions = my.palette, cuts = 6, col = "transparent", main="Nombre de gros crimes en France (1833)")
-spplot(gfrance85,"Crime_prop", col.regions = my.palette, cuts = 6, col = "transparent", main="Nombre de suicides en France (1833)")
-spplot(gfrance85,"Wealth", col.regions = my.palette, cuts = 6, col = "transparent", main="Richesses en France (1833)")
+spplot(gfrance85,"Crime_pers", col.regions = my.palette, cuts = 6, col = "transparent", main="Nombre de crimes contre des personnes en France (1833)")
 ```
 
 # Calculer des centroides des departements
 
 ```{r}
 centroids <- coordinates(gfrance85)
-plot(gfrance85)
-points(centroids, pch = 20, col = "Green", cex=0.5)
 ```
 
 # Matrice de contiguité
@@ -62,6 +58,8 @@ summary(voisins)
 
 `r gfrance85$Department[c(22,26,54,59,63,65,70)] ` sont les départements les plus isolés, tandis que `r gfrance85$Department[46] ` et `r gfrance85$Department[72] `
 les plus connectées.
+
+## Matrice de contiguité
 
 ```{r}
 ### Matrice de contiguite standardisee en ligne, methode par defaut
@@ -95,22 +93,12 @@ distance[distance>=100000 ]<-0
 dist<- 1.e6 / (distance*distance) #inverse de la dist au carre
 dist[dist>1.e9]<-0
 dist.w<-mat2listw(dist, row.names = NULL, style="W")
+```
+## Autocorrélation spatiale
 
-############################################
-### Statistiques descriptives            ###
-############################################
-
-### Tableau 1 : Analyses descriptives
-
-
-############################################
-### Graphique de Moran                   ###
-############################################
-
-# stat des d'autocorr spatiale
-
+```{r}
 ### Test de Moran, Donnees Brutes
-moran.test(gfrance85$Suicides, dist.w, zero.policy=TRUE) # permet de recup la stat de Moran
+moran.test(gfrance85$Crime_pers, dist.w, zero.policy=TRUE) # permet de recup la stat de Moran
 #I de Moran = 5.2661
 
 ### Graphique de Moran
@@ -118,3 +106,4 @@ moran.plot(x=gfrance85$Crime_pers,dist.w,xlab="Criminalite France 1833",
            ylab="Taux dans le voisinage",
            zero.policy=TRUE)
 ```
+
