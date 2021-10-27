@@ -65,16 +65,21 @@ les plus connectées.
 ### Matrice de contiguite standardisee en ligne, methode par defaut
 cont.w <- nb2listw(voisins,style="W")
 ```
-## Autocorrélation spatiale
+
+## Autocorrélation spatiale globale
 
 ```{r}
 ### Test de Moran, Donnees Brutes
 moran.test(gfrance85$Crime_pers, cont.w, zero.policy=TRUE) # permet de recup la stat de Moran
-#I de Moran = 5.2661
 
 ### Graphique de Moran
-moran.plot(x=gfrance85$Crime_pers,cont.w,xlab="Criminalite France 1833",
-           ylab="Taux dans le voisinage",
+op <- par(mar=c(5, 6, 4, 2) + 0.1)
+moran.plot(x=gfrance85$Crime_pers,cont.w,xlab="Crimes contre des personnes par département",
+           ylab="W * Crimes contre des personnes\npar département",
            zero.policy=TRUE)
+par(op)
+
+### Test de Geary
+geary.test(gfrance85$Crime_pers, cont.w, zero.policy=TRUE)
 ```
 
