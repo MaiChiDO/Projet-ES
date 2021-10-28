@@ -28,6 +28,7 @@ library(sp)
 library(stargazer)
 library(corrplot)
 library(spatialreg)
+library(gridExtra)
 ```
 
 # Importation des données
@@ -79,7 +80,7 @@ par(op)
 ```{r}
 my.palette <- brewer.pal(n = 7, name = "OrRd")
 
-spplot(gfrance85,"Crime_prop", col.regions = my.palette, cuts = 6, col = "transparent", main="Population par crime contre la propriété")
+spplot(gfrance85,"Crime_prop", col.regions = my.palette, cuts = 6, col = "transparent", main="Population par crime\ncontre la propriété")
 spplot(gfrance85,"Suicides", col.regions = my.palette, cuts = 6, col = "transparent", main="Population par suicide")
 spplot(gfrance85,"Wealth", col.regions = my.palette, cuts = 6, col = "transparent", main="Niveau de richesse")
 ```
@@ -117,8 +118,8 @@ moran.test(gfrance85$Crime_prop, cont.w, zero.policy=TRUE) # permet de recup la 
 
 ### Graphique de Moran
 op <- par(mar=c(5, 6, 4, 2) + 0.1)
-moran.plot(x=gfrance85$Crime_prop,cont.w,xlab="Crimes contre des personnes par département",
-           ylab="W * Crimes contre des personnes\npar département",
+moran.plot(x=gfrance85$Crime_prop,cont.w,xlab="Population par crime contre la\npropriété par département",
+           ylab="W * Population par crime contre la\npropriété par département",
            zero.policy=TRUE)
 par(op)
 
@@ -132,6 +133,8 @@ geary.test(gfrance85$Crime_prop, cont.w, zero.policy=TRUE)
 lisa <- localmoran(gfrance85$Crime_prop,cont.w,zero.policy=
 TRUE)
 ```
+
+# Modèles
 
 ```{r}
 model <- Crime_prop ~ Suicides+Wealth
