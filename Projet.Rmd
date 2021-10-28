@@ -25,6 +25,9 @@ library(classInt)
 library(Guerry)
 library(GISTools)
 library(sp)
+library(stargazer)
+library(corrplot)
+library(spatialreg)
 ```
 
 # Importation des données
@@ -33,12 +36,52 @@ library(sp)
 data(gfrance85)
 ```
 
+# Statistique descriptive
+
+```{r}
+df <- data.frame(gfrance85)[,c("Crime_prop","Suicides","Wealth")]
+stargazer(df,type="latex",summary.stat = c("mean", "median", "sd", "max", "min"))
+summary(df)
+
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+mcor<-cor(df)
+cor.mtest <- function(mat, ...) {
+        mat <- as.matrix(mat)
+        n <- ncol(mat)
+        p.mat<- matrix(NA, n, n)
+        diag(p.mat) <- 0
+        for (i in 1:(n - 1)) {
+            for (j in (i + 1):n) {
+                tmp <- cor.test(mat[, i], mat[, j], ...)
+                p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+            }
+        }
+      colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+      p.mat
+}
+p.mat <- cor.mtest(df)
+op <- par(mar=c(5, 6, 4, 2) + 0.1)
+corrplot(mcor, method="color", col=col(200),  
+             type="upper", order="hclust", 
+             addCoef.col = "black", # Ajout du coefficient de corrélation
+             tl.col="black", tl.srt=45, #Rotation des etiquettes de textes
+             # Combiner avec le niveau de significativité
+             p.mat = p.mat, sig.level = 0.05, insig = "blank", 
+             # Cacher les coefficients de corrélation sur la diagonale
+             diag=FALSE 
+             )
+par(op)
+```
+
+
 # Cartographie
 
 ```{r}
 my.palette <- brewer.pal(n = 7, name = "OrRd")
 
-spplot(gfrance85,"Crime_pers", col.regions = my.palette, cuts = 6, col = "transparent", main="Nombre de crimes contre des personnes en France (1833)")
+spplot(gfrance85,"Crime_prop", col.regions = my.palette, cuts = 6, col = "transparent", main="Population par crime contre la propriété")
+spplot(gfrance85,"Suicides", col.regions = my.palette, cuts = 6, col = "transparent", main="Population par suicide")
+spplot(gfrance85,"Wealth", col.regions = my.palette, cuts = 6, col = "transparent", main="Niveau de richesse")
 ```
 
 # Calculer des centroides des departements
@@ -70,16 +113,34 @@ cont.w <- nb2listw(voisins,style="W")
 
 ```{r}
 ### Test de Moran, Donnees Brutes
-moran.test(gfrance85$Crime_pers, cont.w, zero.policy=TRUE) # permet de recup la stat de Moran
+moran.test(gfrance85$Crime_prop, cont.w, zero.policy=TRUE) # permet de recup la stat de Moran
 
 ### Graphique de Moran
 op <- par(mar=c(5, 6, 4, 2) + 0.1)
-moran.plot(x=gfrance85$Crime_pers,cont.w,xlab="Crimes contre des personnes par département",
+moran.plot(x=gfrance85$Crime_prop,cont.w,xlab="Crimes contre des personnes par département",
            ylab="W * Crimes contre des personnes\npar département",
            zero.policy=TRUE)
 par(op)
 
 ### Test de Geary
-geary.test(gfrance85$Crime_pers, cont.w, zero.policy=TRUE)
+geary.test(gfrance85$Crime_prop, cont.w, zero.policy=TRUE)
+```
+
+## Autocorrélation spatiale locale
+
+```{r}
+lisa <- localmoran(gfrance85$Crime_prop,cont.w,zero.policy=
+TRUE)
+```
+
+```{r}
+model <- Crime_prop ~ Suicides+Wealth
+ze.lm <- lm(model, data=gfrance85)
+summary(ze.lm)
+
+lm.morantest(ze.lm,cont.w)
+
+ze.sem<-errorsarlm(model, data=gfrance85, cont.w)
+summary(ze.sem)
 ```
 
