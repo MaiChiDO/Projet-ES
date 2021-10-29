@@ -29,6 +29,7 @@ library(stargazer)
 library(corrplot)
 library(spatialreg)
 library(gridExtra)
+library(adespatial)
 ```
 
 # Importation des données
@@ -40,7 +41,7 @@ data(gfrance85)
 # Statistique descriptive
 
 ```{r}
-df <- data.frame(gfrance85)[,c("Crime_prop","Suicides","Wealth")]
+df <- data.frame(gfrance85)[,c("Suicides","Crime_prop","Wealth")]
 stargazer(df,type="latex",summary.stat = c("mean", "median", "sd", "max", "min"))
 summary(df)
 
@@ -114,17 +115,20 @@ cont.w <- nb2listw(voisins,style="W")
 
 ```{r}
 ### Test de Moran, Donnees Brutes
-moran.test(gfrance85$Crime_prop, cont.w, zero.policy=TRUE) # permet de recup la stat de Moran
+moran.test(gfrance85$Suicides, cont.w, zero.policy=TRUE) # permet de recup la stat de Moran
+
+### Monte-Carlo test
+moran.randtest(gfrance85$Suicides, cont.w)
 
 ### Graphique de Moran
 op <- par(mar=c(5, 6, 4, 2) + 0.1)
-moran.plot(x=gfrance85$Crime_prop,cont.w,xlab="Population par crime contre la\npropriété par département",
-           ylab="W * Population par crime contre la\npropriété par département",
+moran.plot(x=gfrance85$Suicides,cont.w,xlab="Population par suicide par département",
+           ylab="W * Population par suicide\npar département",
            zero.policy=TRUE)
 par(op)
 
 ### Test de Geary
-geary.test(gfrance85$Crime_prop, cont.w, zero.policy=TRUE)
+geary.test(gfrance85$Suicides, cont.w, zero.policy=TRUE)
 ```
 
 ## Autocorrélation spatiale locale
@@ -137,13 +141,35 @@ TRUE)
 # Modèles
 
 ```{r}
-model <- Crime_prop ~ Suicides+Wealth
+### Modèle estimé
+model <- Suicides ~ Crime_prop+Wealth
+matrice <- cont.w
+
+## Modèle MCO
 ze.lm <- lm(model, data=gfrance85)
 summary(ze.lm)
+### Test de Moran adapté sur les résidus
+lm.morantest(ze.lm,cont.w,alternative = "two.sided")
 
-lm.morantest(ze.lm,cont.w)
+### Test LM-Error et LM-Lag
+lm.LMtests(ze.lm,matrice,test="LMerr")
+lm.LMtests(ze.lm,matrice,test="LMlag")
+lm.LMtests(ze.lm,matrice,test="RLMerr")
+lm.LMtests(ze.lm,matrice,test="RLMlag")
 
-ze.sem<-errorsarlm(model, data=gfrance85, cont.w)
+### Modèle SEM
+ze.sem<-errorsarlm(modele, data=donnees_ze, matrice)
 summary(ze.sem)
+
+### Test d’Hausman
+Hausman.test(ze.sem)
+
+### Modèle SAR
+ze.sar<-lagsarlm(modele, data=donnees_ze, matrice)
+summary(ze.sar)
+
+### Modèle SDM
+ze.sardm<-lagsarlm(modele, data=donnees_ze, matrice, type="mixed")
+summary(ze.sardm)
 ```
 
