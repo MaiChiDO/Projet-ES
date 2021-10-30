@@ -31,6 +31,7 @@ library(spatialreg)
 library(gridExtra)
 library(adespatial)
 library(spatialreg)
+library(kableExtra)
 ```
 
 # Importation des données
@@ -49,30 +50,30 @@ summary(df)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 mcor<-cor(df)
 cor.mtest <- function(mat, ...) {
-        mat <- as.matrix(mat)
-        n <- ncol(mat)
-        p.mat<- matrix(NA, n, n)
-        diag(p.mat) <- 0
-        for (i in 1:(n - 1)) {
-            for (j in (i + 1):n) {
-                tmp <- cor.test(mat[, i], mat[, j], ...)
-                p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
-            }
-        }
-      colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
-      p.mat
+  mat <- as.matrix(mat)
+  n <- ncol(mat)
+  p.mat<- matrix(NA, n, n)
+  diag(p.mat) <- 0
+  for (i in 1:(n - 1)) {
+    for (j in (i + 1):n) {
+      tmp <- cor.test(mat[, i], mat[, j], ...)
+      p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+    }
+  }
+  colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+  p.mat
 }
 p.mat <- cor.mtest(df)
 op <- par(mar=c(5, 6, 4, 2) + 0.1)
 corrplot(mcor, method="color", col=col(200),  
-             type="upper", order="hclust", 
-             addCoef.col = "black", # Ajout du coefficient de corrélation
-             tl.col="black", tl.srt=45, #Rotation des etiquettes de textes
-             # Combiner avec le niveau de significativité
-             p.mat = p.mat, sig.level = 0.05, insig = "blank", 
-             # Cacher les coefficients de corrélation sur la diagonale
-             diag=FALSE 
-             )
+         type="upper", order="hclust", 
+         addCoef.col = "black", # Ajout du coefficient de corrélation
+         tl.col="black", tl.srt=45, #Rotation des etiquettes de textes
+         # Combiner avec le niveau de significativité
+         p.mat = p.mat, sig.level = 0.05, insig = "blank", 
+         # Cacher les coefficients de corrélation sur la diagonale
+         diag=FALSE 
+)
 par(op)
 ```
 
@@ -136,7 +137,7 @@ geary.test(gfrance85$Suicides, cont.lw, zero.policy=TRUE)
 
 ```{r}
 lisa <- localmoran(gfrance85$Crime_prop,cont.lw,zero.policy=
-TRUE)
+                     TRUE)
 ```
 
 # Modèles
@@ -148,13 +149,13 @@ matrice <- cont.lw
 
 ## Modèle MCO
 ze.lm <- lm(modele, data=gfrance85)
-summary(lm)
+summary(ze.lm)
 ### Test de Moran adapté sur les résidus
 lm.morantest(ze.lm,matrice,alternative = "two.sided")
 
 ### Test LM-Error et LM-Lag
 res <- lm.LMtests(ze.lm, matrice, test=c("LMerr", "LMlag",
-  "RLMerr", "RLMlag"))
+                                         "RLMerr", "RLMlag"))
 summary(res)
 
 ### Modèle SEM
@@ -182,4 +183,16 @@ print(FC.test)
 
 stargazer(ze.lm,ze.sem,ze.slx,ze.sar,ze.sardm,type="text")
 ```
+
+## AIC
+
+```{r}
+aic <- kbl(data.frame("Modèle"="AIC",'SLX'=AIC(ze.slx),
+                      'SEM'=AIC(ze.sem),
+                      'SAR'=AIC(ze.sar),
+                      "SDM"=AIC(ze.sardm)),
+           format="latex", align = "cc") %>% kable_classic(full_width = F, html_font = "Cambria")
+aic
+```
+
 
