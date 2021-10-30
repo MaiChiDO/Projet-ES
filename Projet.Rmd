@@ -43,7 +43,7 @@ data(gfrance85)
 # Statistique descriptive
 
 ```{r}
-df <- data.frame(gfrance85)[,c("Suicides","Crime_prop","Wealth")]
+df <- data.frame(gfrance85)[,c("Suicides","Crime_prop","Wealth","Crime_pers")]
 stargazer(df,type="latex",summary.stat = c("mean", "median", "sd", "max", "min"))
 summary(df)
 
@@ -65,15 +65,16 @@ cor.mtest <- function(mat, ...) {
 }
 p.mat <- cor.mtest(df)
 op <- par(mar=c(5, 6, 4, 2) + 0.1)
-corrplot(mcor, method="color", col=col(200),  
-         type="upper", order="hclust", 
+
+corrplot(mcor, method="color", col=col(200),
+         type="upper", order="hclust",
          addCoef.col = "black", # Ajout du coefficient de corrélation
          tl.col="black", tl.srt=45, #Rotation des etiquettes de textes
          # Combiner avec le niveau de significativité
-         p.mat = p.mat, sig.level = 0.05, insig = "blank", 
+         p.mat = p.mat, sig.level = 0.05, #insig = "blank",
          # Cacher les coefficients de corrélation sur la diagonale
-         diag=FALSE 
-)
+         diag=FALSE
+) # j'aurais tendance a vouloir rajouter Crime_pers dans la matrice de corr, pour justifier le fait qu'on ne l'inclut pas dans notre modele, vu que ca me semble etre une variable importante!
 par(op)
 ```
 
