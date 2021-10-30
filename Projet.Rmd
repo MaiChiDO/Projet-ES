@@ -148,7 +148,7 @@ matrice <- cont.lw
 
 ## Modèle MCO
 ze.lm <- lm(modele, data=gfrance85)
-summary(lm)
+summary(ze.lm)
 ### Test de Moran adapté sur les résidus
 lm.morantest(ze.lm,matrice,alternative = "two.sided")
 
