@@ -43,7 +43,7 @@ data(gfrance85)
 # Statistique descriptive
 
 ```{r}
-df <- data.frame(gfrance85)[,c("Suicides","Crime_prop","Wealth","Crime_pers")]
+df <- data.frame(gfrance85)[,c("Suicides","Crime_prop","Wealth","Crime_pers","Infants","Donations","Literacy")]
 stargazer(df,type="latex",summary.stat = c("mean", "median", "sd", "max", "min"))
 summary(df)
 
@@ -220,13 +220,23 @@ distance[distance>=100000 ]<-0
 dist<- 1.e6 / (distance*distance) #inverse de la dist au carre
 dist[dist>1.e9]<-0
 dist.lw<-mat2listw(dist, row.names = NULL, style="W")
+```
 
-## Modèles SDM
-sdm.cont <- lagsarlm(modele, data=gfrance85, cont.lw, type="mixed")
-sdm.2p <- lagsarlm(modele, data=gfrance85, PPV2.lw, type="mixed")
-sdm.5p <- lagsarlm(modele, data=gfrance85, PPV5.lw, type="mixed")
-sdm.dist <- lagsarlm(modele, data=gfrance85, dist.lw, type="mixed")
+```{r}
+## Modèles SAR
+sar.cont <- lagsarlm(modele, data=gfrance85, cont.lw)
+sar.2p <- lagsarlm(modele, data=gfrance85, PPV2.lw)
+sar.5p <- lagsarlm(modele, data=gfrance85, PPV5.lw)
+sar.dist <- lagsarlm(modele, data=gfrance85, dist.lw)
 
-stargazer(sdm.cont,sdm.2p,sdm.5p,sdm.dist,column.labels=c("SDM\nContiguïté","SDM\n2 voisins","SDM\n5 voisins","SDM\nDistance"), align=TRUE, no.space=TRUE)
+stargazer(ze.lm,ze.sardm,sar.cont,sar.2p,sar.5p,sar.dist,column.labels=c("MCO","SDM Contiguïté","SAR\nContiguïté","SAR\n2 voisins","SAR\n5 voisins","SAR\nDistance"), align=TRUE, no.space=TRUE)
+
+summary(sar.cont)
+summary(sar.2p)
+summary(sar.5p)
+summary(sar.dist)
+
+impactSAR <-impacts(sar.cont,listw=cont.lw)
+impactSAR
 ```
 
