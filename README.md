@@ -1,9 +1,5 @@
 # Projet ES
  
-# Description des données
+# Description des donnÃ©es
 
-Nos données spatiales contiennent 86 observations étant les départements en France avec 23 variables et les coordonnées géographiques associées. Le type des données est surfacique et en analysant ces données, il nous permet à savoir quels sont les caractéristiques qui explique le nombre de sucides dans les départements.
-
-# Sémiologie cartographique
-
-Nous commençon par étudier des sémiologie cartographique et ces figures nous confirme l'utile de l'économétrie spatiale dans ce cas.
+Nos donnÃ©es spatiales contiennent 86 observations Ã©tant les dÃ©partements en France avec 23 variables et les coordonnÃ©es gÃ©ographiques associÃ©es. Le type des donnÃ©es est surfacique et en analysant ces donnÃ©es, il nous permet Ã  savoir quels sont les caractÃ©ristiques qui explique le sucide dans en France dans les annÃ©es 1833.
