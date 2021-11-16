@@ -72,6 +72,8 @@ cont.lw <- nb2listw(voisins,style="W")
 
 #____________________ Autocorrélation spatiale _______________________
 
+### Variable expliquée ###
+
 ## Test de Moran, Donnees Brutes
 moran.test(gfrance85$Suicides, cont.lw, zero.policy=TRUE,randomisation=FALSE,,alternative="two.sided") # permet de recup la stat de Moran
 
@@ -83,6 +85,28 @@ par(op)
 
 ## Test de Geary
 geary.test(gfrance85$Suicides, cont.lw, zero.policy=TRUE,randomisation=FALSE ,alternative="two.sided")
+
+
+### Variables explicatives ###
+
+## Test de Moran, Donnees Brutes
+moran.test(gfrance85$Crime_prop, cont.lw, zero.policy=TRUE,randomisation=FALSE,,alternative="two.sided") 
+moran.test(gfrance85$Wealth, cont.lw, zero.policy=TRUE,randomisation=FALSE,,alternative="two.sided") 
+
+## Graphique de Moran
+moran.plot(x=gfrance85$Crime_prop,cont.lw,xlab="Population par suicide par département",
+           ylab="W * Population par crime contre la propriété\npar département",
+           zero.policy=TRUE)
+par(op)
+
+moran.plot(x=gfrance85$Wealth,cont.lw,xlab="Population par suicide par département",
+           ylab="W * Niveau de richesse\npar département",
+           zero.policy=TRUE)
+par(op)
+
+## Test de Geary
+geary.test(gfrance85$Crime_prop, cont.lw, zero.policy=TRUE,randomisation=FALSE ,alternative="two.sided")
+geary.test(gfrance85$Wealth, cont.lw, zero.policy=TRUE,randomisation=FALSE ,alternative="two.sided")
 
 #_________________________ Modèles ___________________________________
 
