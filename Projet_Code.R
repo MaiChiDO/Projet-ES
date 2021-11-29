@@ -67,6 +67,9 @@ spplot(gfrance85,"Wealth", col.regions = my.palette, cuts = 6, col = "transparen
 ## Definition de voisins
 voisins <- poly2nb(gfrance85)
 
+## Calculer des centroides des departements
+centroids <- coordinates(gfrance85)
+
 ## Matrice de contiguité standardisee
 cont.lw <- nb2listw(voisins,style="W")
 
@@ -78,6 +81,7 @@ cont.lw <- nb2listw(voisins,style="W")
 moran.test(gfrance85$Suicides, cont.lw, zero.policy=TRUE,randomisation=FALSE,,alternative="two.sided") # permet de recup la stat de Moran
 
 ## Graphique de Moran
+op <- par(mar=c(5, 6, 4, 2) + 0.1)
 moran.plot(x=gfrance85$Suicides,cont.lw,xlab="Population par suicide par département",
            ylab="W * Population par suicide\npar département",
            zero.policy=TRUE)
@@ -94,12 +98,14 @@ moran.test(gfrance85$Crime_prop, cont.lw, zero.policy=TRUE,randomisation=FALSE,,
 moran.test(gfrance85$Wealth, cont.lw, zero.policy=TRUE,randomisation=FALSE,,alternative="two.sided") 
 
 ## Graphique de Moran
-moran.plot(x=gfrance85$Crime_prop,cont.lw,xlab="Population par suicide par département",
-           ylab="W * Population par crime contre la propriété\npar département",
+op <- par(mar=c(5, 6, 4, 2) + 0.1)
+moran.plot(x=gfrance85$Crime_prop,cont.lw,xlab="Population par crime contre la propriété\npar département",
+           ylab="W * Population par crime contre\nla propriété par département",
            zero.policy=TRUE)
 par(op)
 
-moran.plot(x=gfrance85$Wealth,cont.lw,xlab="Population par suicide par département",
+op <- par(mar=c(5, 6, 4, 2) + 0.1)
+moran.plot(x=gfrance85$Wealth,cont.lw,xlab="Niveau de richesse par département",
            ylab="W * Niveau de richesse\npar département",
            zero.policy=TRUE)
 par(op)
@@ -111,7 +117,7 @@ geary.test(gfrance85$Wealth, cont.lw, zero.policy=TRUE,randomisation=FALSE ,alte
 #_________________________ Modèles ___________________________________
 
 ## Modèle estimé
-modele <- Suicides ~ Crime_prop+Wealth
+modele <- log(Suicides) ~ Crime_prop+Wealth
 matrice <- cont.lw
 
 ## Modèle MCO
