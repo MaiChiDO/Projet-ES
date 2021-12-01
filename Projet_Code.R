@@ -17,7 +17,7 @@ library(adespatial)
 library(spatialreg)
 library(kableExtra)
 
-#____________________ Importation des donn?es__________________________
+#____________________ Importation des données__________________________
 
 data(gfrance85)
 
@@ -46,11 +46,11 @@ p.mat <- cor.mtest(df)
 op <- par(mar=c(5, 6, 4, 2) + 0.1)
 corrplot(mcor, method="color", col=col(200),
          type="upper", order="hclust",
-         addCoef.col = "black", # Ajout du coefficient de corr?lation
+         addCoef.col = "black", # Ajout du coefficient de corrélation
          tl.col="black", tl.srt=45, #Rotation des etiquettes de textes
-         # Combiner avec le niveau de significativit?
+         # Combiner avec le niveau de significativité
          p.mat = p.mat, sig.level = 0.05, #insig = "blank",
-         # Cacher les coefficients de corr?lation sur la diagonale
+         # Cacher les coefficients de corrélation sur la diagonale
          diag=FALSE)
 par(op)
 
@@ -62,7 +62,7 @@ spplot(gfrance85,"Crime_prop", col.regions = my.palette, cuts = 6, col = "transp
 spplot(gfrance85,"Suicides", col.regions = my.palette, cuts = 6, col = "transparent", main="Population par suicide")
 spplot(gfrance85,"Wealth", col.regions = my.palette, cuts = 6, col = "transparent", main="Niveau de richesse")
 
-#_____________________ Matrice de contiguit? __________________________
+#_____________________ Matrice de contiguité __________________________
 
 ## Definition de voisins
 voisins <- poly2nb(gfrance85)
@@ -70,26 +70,26 @@ voisins <- poly2nb(gfrance85)
 ## Calculer des centroides des departements
 centroids <- coordinates(gfrance85)
 
-## Matrice de contiguit? standardisee
+## Matrice de contiguité standardisée
 cont.lw <- nb2listw(voisins,style="W")
 
-#____________________ Autocorr?lation spatiale _______________________
+#____________________ Autocorrélation spatiale _______________________
 
-### Variable expliqu?e ###
+### Variable expliquée ###
 
 ## Test de Moran, Donnees Brutes
 moran.test(gfrance85$Suicides, cont.lw, zero.policy=TRUE,randomisation=FALSE,,alternative="two.sided") # permet de recup la stat de Moran
 
 ## Graphique de Moran
 op <- par(mar=c(5, 6, 4, 2) + 0.1)
-moran.plot(x=gfrance85$Suicides,cont.lw,xlab="Population par suicide par dÃ©partement",
-           ylab="W * Population par suicide\npar dÃ©partement",
+moran.plot(x=gfrance85$Suicides,cont.lw,xlab="Population par suicide par département",
+           ylab="W * Population par suicide\npar département",
            zero.policy=TRUE)
 par(op)
 
 ## # Identification des quadrants du diagramme de moran pour chaque observation
 
-#crÃ©ation d'une nouvelle variable pour identifer les quadrants
+#création d'une nouvelle variable pour identifer les quadrants
 gfrance85$quad_sig <- NA
 #HH
 gfrance85@data[(zx >= 0 & wzx >= 0) & (locm[, 5] <= 0.05), "quad_sig"] <- 1.0
@@ -102,7 +102,7 @@ gfrance85@data[(zx >= 0 & wzx <= 0) & (locm[, 5] <= 0.05), "quad_sig"] <- 4.0
 #pas significatifs
 gfrance85@data[(locm[, 5] > 0.05), "quad_sig"] <- 5.0
 
-#vÃ©rification
+#vérification
 table(gfrance85$quad_sig)
 
 
@@ -112,11 +112,11 @@ breaks <- seq(1, 5, 1)
 # labels des classes 
 labels <- c("High-High", "low-Low", "High-Low", "Low-High", "Not Signif.")
 
-# NÃ©cessaire pour faire la carte
+# Nécessaire pour faire la carte
 help("findInterval")
 gfrance85$np <- findInterval(gfrance85$quad_sig, breaks)
 
-# Affectation des couleurs Ã  chaque classe
+# Affectation des couleurs à chaque classe
 col.map <- c("darkred", "skyblue2","lightpink","violetred1", "white")
 plot(gfrance85, col = col.map[gfrance85$np])  
 mtext("Local Moran's I", cex = 1.5, side = 3, line = 1)
@@ -134,14 +134,14 @@ moran.test(gfrance85$Wealth, cont.lw, zero.policy=TRUE,randomisation=FALSE,,alte
 
 ## Graphique de Moran
 op <- par(mar=c(5, 6, 4, 2) + 0.1)
-moran.plot(x=gfrance85$Crime_prop,cont.lw,xlab="Population par crime contre la propri?t?\npar d?partement",
-           ylab="W * Population par crime contre\nla propri?t? par d?partement",
+moran.plot(x=gfrance85$Crime_prop,cont.lw,xlab="Population par crime contre la propriété\npar d?partement",
+           ylab="W * Population par crime contre\nla propriété par d?partement",
            zero.policy=TRUE)
 par(op)
 
 op <- par(mar=c(5, 6, 4, 2) + 0.1)
-moran.plot(x=gfrance85$Wealth,cont.lw,xlab="Niveau de richesse par d?partement",
-           ylab="W * Niveau de richesse\npar d?partement",
+moran.plot(x=gfrance85$Wealth,cont.lw,xlab="Niveau de richesse par département",
+           ylab="W * Niveau de richesse\npar département",
            zero.policy=TRUE)
 par(op)
 
@@ -149,17 +149,17 @@ par(op)
 geary.test(gfrance85$Crime_prop, cont.lw, zero.policy=TRUE,randomisation=FALSE ,alternative="two.sided")
 geary.test(gfrance85$Wealth, cont.lw, zero.policy=TRUE,randomisation=FALSE ,alternative="two.sided")
 
-#_________________________ Mod?les ___________________________________
+#_________________________ Modèles ___________________________________
 
 ## Modèle estimé
 modele <- Suicides ~ Crime_prop + Wealth
 #modele <- log(Suicides) ~ log(Crime_prop) + log(Wealth)
 matrice <- cont.lw
 
-## Mod?le MCO
+## Modèle MCO
 ze.lm <- lm(modele, data=gfrance85)
 summary(ze.lm)
-## Test de Moran adapt? sur les r?sidus
+## Test de Moran adapté sur les résidus
 lm.morantest(ze.lm,matrice,alternative = "two.sided")
 
 ## Test LM-Error et LM-Lag
@@ -167,29 +167,29 @@ res <- lm.LMtests(ze.lm, matrice, test=c("LMerr", "LMlag",
                                          "RLMerr", "RLMlag"))
 summary(res)
 
-## Mod?le SEM
+## Modèle SEM
 ze.sem<-errorsarlm(modele, data=gfrance85, matrice)
 summary(ze.sem)
 ## Test d'Hausman
 Hausman.test(ze.sem)
 
-## Mod?le SLX
+## Modèle SLX
 ze.slx <- lmSLX(modele, data=gfrance85, matrice)
 summary(ze.slx)
 
-## Mod?le SAR
+## Modèle SAR
 ze.sar<-lagsarlm(modele, data=gfrance85, matrice)
 summary(ze.sar)
 
-## Mod?le SDM
+## Modèle SDM
 ze.sardm<-lagsarlm(modele, data=gfrance85, matrice, type="mixed")
 summary(ze.sardm)
 
-## Test de l'hypoth?se de facteur commun
+## Test de l'hypothèse de facteur commun
 FC.test<-LR.sarlm(ze.sar,ze.sardm)
 print(FC.test)
 
-# _________________________ AIC des mod?les ____________________________
+# _________________________ AIC des modèles ____________________________
 
 aic <- kbl(data.frame("Mod?le"="AIC",'SLX'=AIC(ze.slx),
                       'SEM'=AIC(ze.sem),
@@ -198,7 +198,7 @@ aic <- kbl(data.frame("Mod?le"="AIC",'SLX'=AIC(ze.slx),
            format="latex", align = "cc") %>% kable_classic(full_width = F, html_font = "Cambria")
 aic
 
-# _______________ Diff?rents matrices de voisinage _____________________
+# _______________ Différents matrices de voisinage _____________________
 
 ## Definition des 2 plus proches voisins
 ##   k indique le nombre de voisins
@@ -223,7 +223,7 @@ dist<- 1.e6 / (distance*distance) #inverse de la dist au carre
 dist[dist>1.e9]<-0
 dist.lw<-mat2listw(dist, row.names = NULL, style="W")
 
-# ____________ SAR pour diff?rents matrices de voisinage _______________
+# ____________ SAR pour différents matrices de voisinage _______________
 
 sar.cont <- lagsarlm(modele, data=gfrance85, cont.lw)
 sar.2p <- lagsarlm(modele, data=gfrance85, PPV2.lw)
@@ -235,7 +235,7 @@ summary(sar.2p)
 summary(sar.5p)
 summary(sar.dist)
 
-stargazer(sar.cont,sar.2p,sar.5p,sar.dist,column.labels=c("SAR\nContigu?t?","SAR\n2 voisins","SAR\n5 voisins","SAR\nDistance"), align=TRUE, no.space=TRUE)
+stargazer(sar.cont,sar.2p,sar.5p,sar.dist,column.labels=c("SAR\nContiguïté","SAR\n2 voisins","SAR\n5 voisins","SAR\nDistance"), align=TRUE, no.space=TRUE)
 
 ## Effet marginal
 impactSAR <-impacts(sar.cont, listw=cont.lw)
