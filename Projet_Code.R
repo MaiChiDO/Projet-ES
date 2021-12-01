@@ -117,7 +117,8 @@ geary.test(gfrance85$Wealth, cont.lw, zero.policy=TRUE,randomisation=FALSE ,alte
 #_________________________ Modèles ___________________________________
 
 ## Modèle estimé
-modele <- log(Suicides) ~ Crime_prop+Wealth
+modele <- Suicides ~ Crime_prop + Wealth
+#modele <- log(Suicides) ~ log(Crime_prop) + log(Wealth)
 matrice <- cont.lw
 
 ## Modèle MCO
@@ -202,8 +203,5 @@ summary(sar.dist)
 stargazer(sar.cont,sar.2p,sar.5p,sar.dist,column.labels=c("SAR\nContiguïté","SAR\n2 voisins","SAR\n5 voisins","SAR\nDistance"), align=TRUE, no.space=TRUE)
 
 ## Effet marginal
-impactSAR <-impacts(sar.cont,listw=cont.lw)
+impactSAR <-impacts(sar.cont, listw=cont.lw)
 impactSAR
-
-
-
