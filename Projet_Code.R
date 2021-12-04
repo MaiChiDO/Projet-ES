@@ -142,8 +142,8 @@ labels <- c("High-High", "low-Low", "High-Low", "Low-High", "Not Signif.")
 help("findInterval")
 gfrance85$np <- findInterval(gfrance85$quad_sig, breaks)
 
-# Affectation des couleurs e chaque classe
-col.map <- c("darkred", "skyblue2", "lightpink","violetred1", "white")
+# Affectation des couleurs de chaque classe
+col.map <- c("darkred", "skyblue2", "violetred1", "lightpink", "white")
 plot(gfrance85, col = col.map[gfrance85$np])  
 mtext("Local Moran's I", cex = 1.5, side = 3, line = 1)
 legend("topleft", legend = labels, fill = col.map, bty = "n", cex = 0.5)
@@ -178,8 +178,8 @@ geary.test(gfrance85$Wealth, cont.lw, zero.policy=TRUE,randomisation=FALSE ,alte
 #_________________________ Modeles ___________________________________
 
 ## Modele estime
-#modele <- Suicides ~ Crime_prop + Wealth
-modele <- log(Suicides) ~ log(Crime_prop) + log(Wealth)
+modele <- Suicides ~ Crime_prop + Wealth
+#modele <- log(Suicides) ~ log(Crime_prop) + log(Wealth)
 matrice <- cont.lw
 
 ## Modele MCO
