@@ -153,7 +153,6 @@ geary.test(gfrance85$Wealth, cont.lw, zero.policy=TRUE,randomisation=FALSE ,alte
 
 ## Modèle estimé
 modele <- Suicides ~ Crime_prop + Wealth
-#modele <- log(Suicides) ~ log(Crime_prop) + log(Wealth)
 matrice <- cont.lw
 
 ## Modèle MCO
@@ -188,6 +187,8 @@ summary(ze.sardm)
 ## Test de l'hypothèse de facteur commun
 FC.test<-LR.sarlm(ze.sar,ze.sardm)
 print(FC.test)
+
+stargazer(ze.lm,ze.sar,ze.sardm,ze.sem,ze.slx,column.labels=c("MCO","SAR","SDM","SEM","SLX"), align=TRUE, no.space=TRUE)
 
 # _________________________ AIC des modèles ____________________________
 
