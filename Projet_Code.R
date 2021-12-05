@@ -106,7 +106,6 @@ gfrance85@data[(locm[, 5] > 0.05), "quad_sig"] <- 5.0
 #verification
 table(gfrance85$quad_sig)
 
-
 #On affecte 5 aux indicateurs non significatifs
 #categorisation
 breaks <- seq(1, 5, 1)
@@ -114,7 +113,6 @@ breaks <- seq(1, 5, 1)
 labels <- c("High-High", "low-Low", "High-Low", "Low-High", "Not Signif.")
 
 # Necessaire pour faire la carte
-help("findInterval")
 gfrance85$np <- findInterval(gfrance85$quad_sig, breaks)
 
 # Affectation des couleurs a chaque classe
